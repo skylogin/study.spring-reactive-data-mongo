@@ -4,6 +4,9 @@ import static org.springframework.data.mongodb.core.query.Criteria.byExample;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
+import com.greglturnquist.hackingspringboot.reactive.domain.cart.Cart;
+import com.greglturnquist.hackingspringboot.reactive.domain.cart.CartRepository;
+import com.greglturnquist.hackingspringboot.reactive.domain.cartitem.CartItem;
 import com.greglturnquist.hackingspringboot.reactive.domain.item.Item;
 import com.greglturnquist.hackingspringboot.reactive.domain.item.ItemRepository;
 import org.springframework.data.domain.Example;
@@ -12,16 +15,21 @@ import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.mongodb.core.ReactiveFluentMongoOperations;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class InventoryService {
 
-  private ItemRepository repository;
-  private ReactiveFluentMongoOperations fluentOperations;
+  private final ItemRepository itemRepository;
+  private final CartRepository cartRepository;
+  private final ReactiveFluentMongoOperations fluentOperations;
 
-  InventoryService(ItemRepository repository, //
+  InventoryService(
+      ItemRepository itemRepository,
+      CartRepository cartRepository,
       ReactiveFluentMongoOperations fluentOperations) {
-    this.repository = repository;
+    this.itemRepository = itemRepository;
+    this.cartRepository = cartRepository;
     this.fluentOperations = fluentOperations;
   }
 
@@ -35,7 +43,7 @@ public class InventoryService {
 
     Example<Item> probe = Example.of(item, matcher);
 
-    return repository.findAll(probe);
+    return itemRepository.findAll(probe);
 
   }
 
@@ -46,7 +54,7 @@ public class InventoryService {
         .all();
   }
 
-  Flux<Item> searchByFluentExample(String name, String description, boolean useAnd) {
+  public Flux<Item> searchByFluentExample(String name, String description, boolean useAnd) {
     Item item = new Item(name, description, 0.0);
 
     ExampleMatcher matcher = (useAnd //
@@ -59,5 +67,36 @@ public class InventoryService {
     return fluentOperations.query(Item.class) //
         .matching(query(byExample(Example.of(item, matcher)))) //
         .all();
+  }
+
+  public Mono<Cart> addItemToCart(String cartId, String itemId){
+    return this.cartRepository.findById(cartId)
+          .log("foundCart")
+        .defaultIfEmpty(new Cart(cartId))
+          .log("emptyCart")
+        .flatMap(cart -> cart.getCartItems().stream()
+          .filter(cartItem -> cartItem.getItem()
+            .getId().equals(itemId))
+            .findAny()
+            .map(cartItem -> {
+              cartItem.increment();
+              return Mono.just(cart).log("newCartItem");
+            })
+          .orElseGet(() -> {
+            return this.itemRepository.findById(itemId)
+                  .log("fetchedItem")
+                .map(item -> new CartItem(item))
+                  .log("cartItem")
+                .map(cartItem -> {
+                  cart.getCartItems().add(cartItem);
+                  return cart;
+                })
+                  .log("addedCartItem");
+          })
+        )
+          .log("cartWithAnotherItem")
+        .flatMap(cart -> this.cartRepository.save(cart))
+          .log("saveCart");
+
   }
 }
