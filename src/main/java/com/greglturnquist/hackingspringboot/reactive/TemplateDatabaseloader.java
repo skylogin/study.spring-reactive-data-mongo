@@ -1,5 +1,6 @@
 package com.greglturnquist.hackingspringboot.reactive;
 
+import com.greglturnquist.hackingspringboot.reactive.domain.item.Item;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoOperations;

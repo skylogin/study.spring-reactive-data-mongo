@@ -1,4 +1,4 @@
-package com.greglturnquist.hackingspringboot.reactive;
+package com.greglturnquist.hackingspringboot.reactive.domain.item;
 
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 

@@ -1,4 +1,6 @@
-package com.greglturnquist.hackingspringboot.reactive;
+package com.greglturnquist.hackingspringboot.reactive.domain.cartitem;
+
+import com.greglturnquist.hackingspringboot.reactive.domain.item.Item;
 
 public class CartItem {
 

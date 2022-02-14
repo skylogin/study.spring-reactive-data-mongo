@@ -1,4 +1,4 @@
-package com.greglturnquist.hackingspringboot.reactive;
+package com.greglturnquist.hackingspringboot.reactive.domain.item;
 
 import com.mongodb.client.model.geojson.Point;
 import java.util.Date;
