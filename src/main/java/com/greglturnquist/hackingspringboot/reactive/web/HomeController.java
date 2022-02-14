@@ -16,17 +16,9 @@ import reactor.core.publisher.Mono;
 @Controller
 public class HomeController {
 
-  private final ItemRepository itemRepository;
-  private final CartRepository cartRepository;
-  private final CartService cartService;
   private final InventoryService inventoryService;
 
-  public HomeController(ItemRepository itemRepository,
-      CartRepository cartRepository,
-      CartService cartService, InventoryService inventoryService) {
-    this.itemRepository = itemRepository;
-    this.cartRepository = cartRepository;
-    this.cartService = cartService;
+  public HomeController(InventoryService inventoryService) {
     this.inventoryService = inventoryService;
   }
 
@@ -34,8 +26,8 @@ public class HomeController {
   @GetMapping
   public Mono<Rendering> home(){
     return Mono.just(Rendering.view("home.html")
-      .modelAttribute("items", this.itemRepository.findAll().doOnNext(System.out::println))
-      .modelAttribute("cart", this.cartRepository.findById("My Cart")
+      .modelAttribute("items", inventoryService.getInventory().doOnNext(System.out::println))
+      .modelAttribute("cart", inventoryService.getCart("My Cart")
         .defaultIfEmpty(new Cart("My Cart")))
       .build()
     );

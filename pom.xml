@@ -78,6 +78,13 @@
       <version>1.0.3.RELEASE</version>
     </dependency>
 
+    <dependency>
+      <groupId>io.projectreactor.tools</groupId>
+      <artifactId>blockhound-junit-platform</artifactId>
+      <version>1.0.3.RELEASE</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <repositories>
