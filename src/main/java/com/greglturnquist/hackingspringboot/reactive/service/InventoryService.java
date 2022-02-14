@@ -22,15 +22,13 @@ public class InventoryService {
 
   private final ItemRepository itemRepository;
   private final CartRepository cartRepository;
-  private final ReactiveFluentMongoOperations fluentOperations;
+
 
   InventoryService(
       ItemRepository itemRepository,
-      CartRepository cartRepository,
-      ReactiveFluentMongoOperations fluentOperations) {
+      CartRepository cartRepository) {
     this.itemRepository = itemRepository;
     this.cartRepository = cartRepository;
-    this.fluentOperations = fluentOperations;
   }
 
   public Flux<Item> searchByExample(String name, String description, boolean useAnd) {
@@ -47,27 +45,6 @@ public class InventoryService {
 
   }
 
-
-  public Flux<Item> searchByFluentExample(String name, String description){
-    return fluentOperations.query(Item.class)
-        .matching(query(where("TV tray").is(name).and("Smurf").is(description)))
-        .all();
-  }
-
-  public Flux<Item> searchByFluentExample(String name, String description, boolean useAnd) {
-    Item item = new Item(name, description, 0.0);
-
-    ExampleMatcher matcher = (useAnd //
-        ? ExampleMatcher.matchingAll() //
-        : ExampleMatcher.matchingAny()) //
-        .withStringMatcher(StringMatcher.CONTAINING) //
-        .withIgnoreCase() //
-        .withIgnorePaths("price");
-
-    return fluentOperations.query(Item.class) //
-        .matching(query(byExample(Example.of(item, matcher)))) //
-        .all();
-  }
 
   public Mono<Cart> addItemToCart(String cartId, String itemId){
     return this.cartRepository.findById(cartId)

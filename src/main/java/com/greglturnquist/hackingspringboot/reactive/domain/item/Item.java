@@ -2,6 +2,7 @@ package com.greglturnquist.hackingspringboot.reactive.domain.item;
 
 import com.mongodb.client.model.geojson.Point;
 import java.util.Date;
+import java.util.Objects;
 import org.springframework.data.annotation.Id;
 
 public class Item {
@@ -27,6 +28,13 @@ public class Item {
 
   public Item(String name, double price) {
     this.name = name;
+    this.price = price;
+  }
+
+  public Item(String id, String name, String description, double price) {
+    this.id = id;
+    this.name = name;
+    this.description = description;
     this.price = price;
   }
 
@@ -100,5 +108,35 @@ public class Item {
 
   public void setActive(boolean active) {
     this.active = active;
+  }
+
+  @Override
+  public String toString() {
+    return "Item{" +
+        "id='" + id + '\'' +
+        ", name='" + name + '\'' +
+        ", description='" + description + '\'' +
+        ", price=" + price +
+        '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Item item = (Item) o;
+    return Double.compare(item.price, price) == 0 &&
+        Objects.equals(id, item.id) &&
+        Objects.equals(name, item.name) &&
+        Objects.equals(description, item.description);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, description, price);
   }
 }
