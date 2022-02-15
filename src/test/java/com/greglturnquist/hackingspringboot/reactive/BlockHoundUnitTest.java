@@ -1,5 +1,7 @@
 package com.greglturnquist.hackingspringboot.reactive;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -19,6 +21,10 @@ public class BlockHoundUnitTest {
           }
         })
         .as(StepVerifier::create)
-        .verifyComplete();
+        .verifyErrorMatches(throwable -> {
+          assertThat(throwable.getMessage())
+              .contains("Blocking call! java.lang.Thread.sleep");
+          return true;
+        });
   }
 }

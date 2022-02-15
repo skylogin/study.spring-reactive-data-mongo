@@ -9,6 +9,7 @@ import com.greglturnquist.hackingspringboot.reactive.domain.cart.CartRepository;
 import com.greglturnquist.hackingspringboot.reactive.domain.cartitem.CartItem;
 import com.greglturnquist.hackingspringboot.reactive.domain.item.Item;
 import com.greglturnquist.hackingspringboot.reactive.domain.item.ItemRepository;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
@@ -90,5 +91,22 @@ public class InventoryService {
         .flatMap(cart -> this.cartRepository.save(cart))
           .log("saveCart");
 
+  }
+
+  public Mono<Cart> removeOneFromCart(String cartId, String itemId) {
+    return this.cartRepository.findById(cartId)
+        .defaultIfEmpty(new Cart(cartId))
+        .flatMap(cart -> cart.getCartItems().stream()
+            .filter(cartItem -> cartItem.getItem().getId().equals(itemId))
+            .findAny()
+            .map(cartItem -> {
+              cartItem.decrement();
+              return Mono.just(cart);
+            }) //
+            .orElse(Mono.empty()))
+        .map(cart -> new Cart(cart.getId(), cart.getCartItems().stream()
+            .filter(cartItem -> cartItem.getQuantity() > 0)
+            .collect(Collectors.toList())))
+        .flatMap(cart -> this.cartRepository.save(cart));
   }
 }

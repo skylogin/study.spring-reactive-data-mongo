@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import com.greglturnquist.hackingspringboot.reactive.domain.cart.Cart;
 import com.greglturnquist.hackingspringboot.reactive.domain.item.Item;
 import com.greglturnquist.hackingspringboot.reactive.service.InventoryService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -14,6 +15,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+@Disabled("pom.xml에서 blockhound-junit-platform 의존 관계를 제거한 후에 실행해야 성공한다.")
 @WebFluxTest(HomeController.class)
 public class HomeControllerSliceTest {
 
