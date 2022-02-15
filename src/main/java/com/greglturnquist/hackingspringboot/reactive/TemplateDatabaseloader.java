@@ -15,6 +15,7 @@ public class TemplateDatabaseloader {
       mongo.save(new Item("alf alarm clock", 19.99));
       mongo.save(new Item("Smurf TV tray", 24.99));
       mongo.save(new Item("test stuff", 49.99));
+      mongo.save(new Item("TEST", 99.99));
     };
   }
 }
